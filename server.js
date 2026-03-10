@@ -35,7 +35,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const usersFilePath = path.join(__dirname, "data", "users.json");
 
-// Helpers to get and save our user data
+// Helper function to get our user data
 async function getUsers() {
     try {
         const userData = await fs.readFile(usersFilePath);
@@ -45,6 +45,7 @@ async function getUsers() {
     }
 }
 
+// Helper function to save our user data
 async function saveUsers(users) {
     try {
         await fs.writeFile(logsFilePath, JSON.stringify(users));
@@ -53,7 +54,7 @@ async function saveUsers(users) {
     }
 }
 
-// GET
+// GET - returns all users
 app.get("/api/users", async (req, res) => {
     try {
         const users = await getUsers();
@@ -63,17 +64,19 @@ app.get("/api/users", async (req, res) => {
     }
 });
 
-// GET BY ID
+// GET BY ID - returns a user with a provided id if it
 app.get("/api/users/{:id}", async (req, res) => {
-    if (!req.params.id) {
+    const id = req.params.id;
+
+    // This check is to ensure that the id passed in
+    // is a number
+    if (typeof id !== "number") {
         return res.status(400).json("Bad Request");
     }
 
     try {
-        const id = parseInt(req.params.id);
-
         const users = await getUsers();
-        const user = users.find((user) => user.id === id);
+        const user = users.find((user) => user.id === parseInt(id));
 
         if (!user) {
             return res
